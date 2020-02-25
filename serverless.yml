@@ -1,0 +1,15 @@
+service: base
+
+plugins:
+  - serverless-plugin-log-retention
+  - serverless-aws-alias
+
+provider:
+  name: aws
+
+custom:
+  logRetentionInDays: 30 # use global
+
+
+functions:
+  function1:
