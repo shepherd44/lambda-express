@@ -2,16 +2,16 @@
 
 const routerFactory = require('./routerFactory');
 
-const sqsRouter = routerFactory();
+const router = routerFactory();
 
-sqsRouter.get('/', (req, res) => {
+router.get('/', (req, res) => {
   if (req.apiGateway) {
     console.log(req.apiGateway.event);
   }
   res.json({ url: req.url, originalUrl: req.originalUrl });
 });
 
-sqsRouter.get('/', (req, res) => {
+router.get('/key', (req, res) => {
   console.log(req.url);
   if (req.apiGateway) {
     console.log(req.apiGateway.event);
@@ -20,4 +20,4 @@ sqsRouter.get('/', (req, res) => {
   res.json({ url: req.url, originalUrl: req.originalUrl });
 });
 
-module.exports = sqsRouter;
+module.exports = router;
