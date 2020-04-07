@@ -2,7 +2,7 @@
   "name": "base-lambda-nodejs",
   "version": "0.0.0",
   "description": "base lambda nodejs",
-  "main": "lambda.handler",
+  "main": "index.handler",
   "directories": {
     "test": "test"
   },
