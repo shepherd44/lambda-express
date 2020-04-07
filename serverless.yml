@@ -1,4 +1,4 @@
-service: base
+service: lambda_base_express
 
 plugins:
   - serverless-plugin-log-retention

@@ -1,19 +1,30 @@
 'use strict';
+const awsServerlessExpress = require(process.env.NODE_ENV === 'test'
+  ? '../../index'
+  : 'aws-serverless-express');
+const app = require('./src/app');
 
-const aws = require('aws-sdk');
-const auditLogger = require('/opt/core/auditLogger');
+const binaryMimeTypes = [
+  'application/javascript',
+  'application/json',
+  'application/octet-stream',
+  'application/xml',
+  'font/eot',
+  'font/opentype',
+  'font/otf',
+  'image/jpeg',
+  'image/png',
+  'image/svg+xml',
+  'text/comma-separated-values',
+  'text/css',
+  'text/html',
+  'text/javascript',
+  'text/plain',
+  'text/text',
+  'text/xml',
+];
 
-const SQS_API_VERSION = '2012-11-05';
+const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes);
 
-function createSqsClient(version = SQS_API_VERSION) {
-  return (sqsClient = new aws.SQS({ apiVersion: version }));
-}
-
-exports.handler = function(event, context, callback) {
-  auditLogger.writeAsync(event);
-
-  let result = {};
-  callback(null, result);
-};
-
-module.exports = {};
+exports.handler = (event, context) =>
+  awsServerlessExpress.proxy(server, event, context);
