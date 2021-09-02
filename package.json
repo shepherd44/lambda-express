@@ -1,14 +1,16 @@
 {
   "name": "base-lambda-express",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "base lambda express",
-  "main": "index.handler",
+  "main": "src/lambda.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "jest",
-    "deploy": "sls deploy"
+    "deploy": "sls deploy",
+    "start": "node app.local.js",
+    "local": "node scripts/local"
   },
   "repository": {
     "type": "git",
@@ -17,7 +19,8 @@
   "author": "shepherd9664@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "aws-serverless-express": "^3.3.8",
+    "@vendia/serverless-express": "^4.3.4",
+    "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "express": "^4.17.1"
@@ -29,14 +32,15 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-promise": "^4.2.1",
-    "husky": "^4.2.0",
     "jest": "^25.2.7",
     "prettier": "^1.19.1",
-    "pretty-quick": "^2.0.1",
-    "rimraf": "^3.0.2",
+    "serverless": "^2.57.0",
+    "serverless-aws-alias": "^1.8.0",
+    "serverless-deployment-bucket": "^1.5.1",
+    "serverless-layers": "^2.5.1",
     "serverless-plugin-log-retention": "^2.0.0"
   },
   "engines": {
-    "node": ">=10.10.0"
+    "node": ">=14.0.0"
   }
 }

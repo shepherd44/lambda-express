@@ -1,15 +1,56 @@
-service: lambda_base_express
+service: base-lambda-express
 
 plugins:
-  - serverless-plugin-log-retention
-  - serverless-aws-alias
+  # - serverless-plugin-log-retention
+  - serverless-layers
+  - serverless-deployment-bucket
+
+custom:
+  VPC_CIDR: 10.0.0.0/16
+  DB_NAME: test_database
+  DB_USERNAME: db_user
+  DB_PASSWORD: db_user_password
+  DB_SUBNET_CIDR_A: 10.0.0.0/24
+  DB_SUBNET_CIDR_B: 10.0.1.0/24
+  DB_SUBNET_CIDR_C: 10.0.2.0/24
+  DEPLOY_BUCKET_NAME: ${self:provider.region}-${self:service}-deploys
+
+  # logRetentionInDays: 30 # use global
+  serverless-layers:
+    # applies all lambdas
+    - common:
+      dependenciesPath: ./package.json
+  deploymentBucket:
+    blockPublicAccess: true
 
 provider:
   name: aws
+  stage: dev
+  region: ap-northeast-2
+  runtime: nodejs14.x
+  logRetentionInDays: 14
+  deploymentBucket:
+    name: ${self:custom.DEPLOY_BUCKET_NAME}
 
-custom:
-  logRetentionInDays: 30 # use global
-
+resources:
+  Resources:
+    LambdaRole: ${file(./serverless.resources/LambdaRole.yml)}
+    Gateway: ${file(./serverless.resources/Gateway.yml)}
+    RouteTablePublic: ${file(./serverless.resources/RouteTablePublic.yml)}
+    RouteTable: ${file(./serverless.resources/RouteTable.yml)}
+    RoutePublic: ${file(./serverless.resources/RoutePublic.yml)}
+    DBSecurityGroup: ${file(./serverless.resources/DBSecurityGroup.yml)}
+    VPC: ${file(./serverless.resources/VPC.yml)}
+    VPCGatewayAttachment: ${file(./serverless.resources/VPCGatewayAttachment.yml)}
+    DBSubnetA: ${file(./serverless.resources/DBSubnetA.yml)}
+    DBSubnetC: ${file(./serverless.resources/DBSubnetC.yml)}
+    DBSubnetGroup: ${file(./serverless.resources/DBSubnetGroup.yml)}
+    RouteTableAssociateDBSubnetA: ${file(./serverless.resources/RouteTableAssociateDBSubnetA.yml)}
+    RouteTableAssociateDBSubnetC: ${file(./serverless.resources/RouteTableAssociateDBSubnetC.yml)}
+    PostgreRDS: ${file(./serverless.resources/PostgreRDS.yml)}
 
 functions:
   function1:
+    handler: src/lambda.handler
+    environment:
+      key: value
