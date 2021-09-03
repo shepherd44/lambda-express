@@ -6,27 +6,35 @@ plugins:
   - serverless-deployment-bucket
 
 custom:
-  VPC_CIDR: 10.0.0.0/16
+  VPC_CIDR: 172.0.0.0/16
   DB_NAME: test_database
   DB_USERNAME: db_user
   DB_PASSWORD: db_user_password
-  DB_SUBNET_CIDR_A: 10.0.0.0/24
-  DB_SUBNET_CIDR_B: 10.0.1.0/24
-  DB_SUBNET_CIDR_C: 10.0.2.0/24
+  DB_SUBNET_CIDR_A: 172.0.0.0/24
+  DB_SUBNET_CIDR_B: 172.0.1.0/24
+  DB_SUBNET_CIDR_C: 172.0.2.0/24
   DEPLOY_BUCKET_NAME: ${self:provider.region}-${self:service}-deploys
 
   # logRetentionInDays: 30 # use global
   serverless-layers:
     # applies all lambdas
-    - common:
-      dependenciesPath: ./package.json
+    # - common:
+    #   dependenciesPath: ./package.json
+    - express-lambda:
+        functions:
+          - express-lambda
+        dependenciesPath: ./packages/express-lambda/package.json
+    - node-lambda:
+        functions:
+          - node-lambda
+        dependenciesPath: ./packages/node-lambda/package.json
   deploymentBucket:
     blockPublicAccess: true
 
 provider:
   name: aws
-  stage: dev
-  region: ap-northeast-2
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ap-northeast-2'}
   runtime: nodejs14.x
   logRetentionInDays: 14
   deploymentBucket:
@@ -37,7 +45,6 @@ resources:
     LambdaRole: ${file(./serverless.resources/LambdaRole.yml)}
     Gateway: ${file(./serverless.resources/Gateway.yml)}
     RouteTablePublic: ${file(./serverless.resources/RouteTablePublic.yml)}
-    RouteTable: ${file(./serverless.resources/RouteTable.yml)}
     RoutePublic: ${file(./serverless.resources/RoutePublic.yml)}
     DBSecurityGroup: ${file(./serverless.resources/DBSecurityGroup.yml)}
     VPC: ${file(./serverless.resources/VPC.yml)}
@@ -48,9 +55,80 @@ resources:
     RouteTableAssociateDBSubnetA: ${file(./serverless.resources/RouteTableAssociateDBSubnetA.yml)}
     RouteTableAssociateDBSubnetC: ${file(./serverless.resources/RouteTableAssociateDBSubnetC.yml)}
     PostgreRDS: ${file(./serverless.resources/PostgreRDS.yml)}
+    DataTable: ${file(./serverless.resources/DataTable.yml)}
+    CognitoUserPool: ${file(./serverless.resources/CognitoUserPool.yml)}
+    CognitoUserPoolClient: ${file(./serverless.resources/CognitoUserPoolClient.yml)}
+    GatewayCognitoAuthorizer: ${file(./serverless.resources/GatewayCognitoAuthorizer.yml)}
+
+Outputs:
+  CognitoUserPoolId:
+    Value:
+      Ref: CognitoUserPool
+
+  CognitoUserPoolClientId:
+    Value:
+      Ref: CognitoUserPoolClient
+
 
 functions:
-  function1:
-    handler: src/lambda.handler
+  auth:
+    handler: packages/auth/lambda.handler
+    role: LambdaRole
+    package:
+      patterns:
+        - packages/auth/*.js
+        - '!.git/**'
+        - '!node_modules/**'
+      individually: true
     environment:
-      key: value
+      AUTH_URL: ''
+
+  express-lambda:
+    handler: packages/express-lambda/src/lambda.handler
+    role: LambdaRole
+    package:
+      patterns:
+        - packages/express-lambda/**/*.js
+        - packages/express-lambda/*.js
+        - '!.git/**'
+        - '!node_modules/**'
+      individually: true
+    environment:
+      DATA_TABLE_NAME:
+        Fn::GetAtt: [DataTable, Arn]
+    events:
+      - http:
+          path: /data
+          method: GET
+          cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: GatewayCognitoAuthorizer
+
+  node-lambda:
+    handler: packages/node-lambda/lambda.handler
+    role: LambdaRole
+    package:
+      patterns:
+        - packages/node-lambda/*.js
+        - '!.git/**'
+        - '!node_modules/**'
+      individually: true
+    environment:
+      DATA_TABLE_NAME:
+        Fn::GetAtt: [DataTable, Arn]
+      USER_POOL_PROVIDER_URL:
+        Fn::GetAtt: [CognitoUserPool, ProviderURL]
+      USER_POOL_PROVIDER_NAME:
+        Fn::GetAtt: [CognitoUserPool, ProviderName]
+    events:
+      - http:
+          path: /data
+          method: GET
+          cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: GatewayCognitoAuthorizer
+

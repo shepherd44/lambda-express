@@ -1,5 +1,6 @@
 Type: AWS::IAM::Role
 Properties:
+  RoleName: AppLambdaRole
   AssumeRolePolicyDocument:
     Statement:
     - Effect: Allow
@@ -18,3 +19,8 @@ Properties:
               - logs:CreateLogGroup
               - logs:PutLogEvents
             Resource: arn:aws:logs:*:*:*
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource:
+              Fn::GetAtt: [DataTable, Arn]

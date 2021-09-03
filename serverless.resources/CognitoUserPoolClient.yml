@@ -1,0 +1,18 @@
+Type: AWS::Cognito::UserPoolClient
+Properties:
+  ClientName: ServerlessUserPoolClient
+  UserPoolId:
+    Ref: CognitoUserPool
+  GenerateSecret: false
+  SupportedIdentityProviders:
+    - COGNITO
+  ExplicitAuthFlows:
+    - ADMIN_NO_SRP_AUTH
+  AllowedOAuthFlows:
+    - code
+    - implicit
+  AllowedOAuthFlowsUserPoolClient: true
+  AllowedOAuthScopes:
+    - email
+  CallbackURLs:
+    - http://localhost:9000
