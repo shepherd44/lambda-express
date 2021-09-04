@@ -1,7 +1,6 @@
 service: base-lambda-express
 
 plugins:
-  # - serverless-plugin-log-retention
   - serverless-layers
   - serverless-deployment-bucket
 
@@ -11,9 +10,11 @@ custom:
   DB_USERNAME: db_user
   DB_PASSWORD: db_user_password
   DB_SUBNET_CIDR_A: 172.0.0.0/24
-  DB_SUBNET_CIDR_B: 172.0.1.0/24
   DB_SUBNET_CIDR_C: 172.0.2.0/24
   DEPLOY_BUCKET_NAME: ${self:provider.region}-${self:service}-deploys
+  COGNITO_USERPOOL_NAME: ServerlessUserPool
+  COGNITO_USERPOOL_CLIENT_NAME: ServerlessUserPoolClient
+  COGNITO_DOMAIN: serverless-cognito
 
   # logRetentionInDays: 30 # use global
   serverless-layers:
@@ -58,6 +59,7 @@ resources:
     DataTable: ${file(./serverless.resources/DataTable.yml)}
     CognitoUserPool: ${file(./serverless.resources/CognitoUserPool.yml)}
     CognitoUserPoolClient: ${file(./serverless.resources/CognitoUserPoolClient.yml)}
+    CognitoUserPoolDomain: ${file(./serverless.resources/CognitoUserPoolDomain.yml)}
     GatewayCognitoAuthorizer: ${file(./serverless.resources/GatewayCognitoAuthorizer.yml)}
 
 Outputs:

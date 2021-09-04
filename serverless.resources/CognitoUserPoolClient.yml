@@ -1,6 +1,6 @@
 Type: AWS::Cognito::UserPoolClient
 Properties:
-  ClientName: ServerlessUserPoolClient
+  ClientName: ${self:custom.COGNITO_USERPOOL_CLIENT_NAME}
   UserPoolId:
     Ref: CognitoUserPool
   GenerateSecret: false
@@ -14,5 +14,6 @@ Properties:
   AllowedOAuthFlowsUserPoolClient: true
   AllowedOAuthScopes:
     - email
+    - openid
   CallbackURLs:
-    - http://localhost:9000
+    - http://localhost:9000/login-callback

@@ -1,0 +1,11 @@
+@cognito-domain-name = serverless-cognito
+@client-id = cognito-client-id
+@callback-url = http://localhost:9000/login-callback
+
+### code
+
+GET https://{{cognito-domain-name}}.auth.ap-northeast-2.amazoncognito.com/login?response_type=code&client_id={{client-id}}&redirect_uri={{callback-url}}
+
+### token
+
+GET https://{{cognito-domain-name}}.auth.ap-northeast-2.amazoncognito.com/login?response_type=token&client_id={{client-id}}&redirect_uri={{callback-url}}

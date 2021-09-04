@@ -1,6 +1,6 @@
 Type: AWS::Cognito::UserPool
 Properties:
-  UserPoolName: ServerlessUserPool
+  UserPoolName: ${self:custom.COGNITO_USERPOOL_NAME}
   UsernameAttributes:
     - email
   AutoVerifiedAttributes:
