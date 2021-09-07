@@ -16,11 +16,7 @@ custom:
   COGNITO_USERPOOL_CLIENT_NAME: ServerlessUserPoolClient
   COGNITO_DOMAIN: serverless-cognito
 
-  # logRetentionInDays: 30 # use global
   serverless-layers:
-    # applies all lambdas
-    # - common:
-    #   dependenciesPath: ./package.json
     - express-lambda:
         functions:
           - express-lambda
@@ -47,53 +43,25 @@ resources:
     Gateway: ${file(./serverless.resources/Gateway.yml)}
     RouteTablePublic: ${file(./serverless.resources/RouteTablePublic.yml)}
     RoutePublic: ${file(./serverless.resources/RoutePublic.yml)}
-    DBSecurityGroup: ${file(./serverless.resources/DBSecurityGroup.yml)}
     VPC: ${file(./serverless.resources/VPC.yml)}
     VPCGatewayAttachment: ${file(./serverless.resources/VPCGatewayAttachment.yml)}
-    DBSubnetA: ${file(./serverless.resources/DBSubnetA.yml)}
-    DBSubnetC: ${file(./serverless.resources/DBSubnetC.yml)}
-    DBSubnetGroup: ${file(./serverless.resources/DBSubnetGroup.yml)}
-    RouteTableAssociateDBSubnetA: ${file(./serverless.resources/RouteTableAssociateDBSubnetA.yml)}
-    RouteTableAssociateDBSubnetC: ${file(./serverless.resources/RouteTableAssociateDBSubnetC.yml)}
-    PostgreRDS: ${file(./serverless.resources/PostgreRDS.yml)}
     DataTable: ${file(./serverless.resources/DataTable.yml)}
     CognitoUserPool: ${file(./serverless.resources/CognitoUserPool.yml)}
     CognitoUserPoolClient: ${file(./serverless.resources/CognitoUserPoolClient.yml)}
     CognitoUserPoolDomain: ${file(./serverless.resources/CognitoUserPoolDomain.yml)}
     GatewayCognitoAuthorizer: ${file(./serverless.resources/GatewayCognitoAuthorizer.yml)}
 
-Outputs:
-  CognitoUserPoolId:
-    Value:
-      Ref: CognitoUserPool
-
-  CognitoUserPoolClientId:
-    Value:
-      Ref: CognitoUserPoolClient
-
 
 functions:
-  auth:
-    handler: packages/auth/lambda.handler
-    role: LambdaRole
-    package:
-      patterns:
-        - packages/auth/*.js
-        - '!.git/**'
-        - '!node_modules/**'
-      individually: true
-    environment:
-      AUTH_URL: ''
-
   express-lambda:
     handler: packages/express-lambda/src/lambda.handler
     role: LambdaRole
     package:
       patterns:
-        - packages/express-lambda/**/*.js
+        - '!**'
+        - packages/express-lambda/src/**/*.js
+        - packages/express-lambda/src/*.js
         - packages/express-lambda/*.js
-        - '!.git/**'
-        - '!node_modules/**'
       individually: true
     environment:
       DATA_TABLE_NAME:
@@ -101,8 +69,14 @@ functions:
     events:
       - http:
           path: /data
-          method: GET
-          cors: true
+          method: any
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: GatewayCognitoAuthorizer
+      - http:
+          path: /data/{any+}
+          method: any
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId:
@@ -113,9 +87,8 @@ functions:
     role: LambdaRole
     package:
       patterns:
+        - '!**'
         - packages/node-lambda/*.js
-        - '!.git/**'
-        - '!node_modules/**'
       individually: true
     environment:
       DATA_TABLE_NAME:
@@ -126,7 +99,7 @@ functions:
         Fn::GetAtt: [CognitoUserPool, ProviderName]
     events:
       - http:
-          path: /data
+          path: /node
           method: GET
           cors: true
           authorizer:

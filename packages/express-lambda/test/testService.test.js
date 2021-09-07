@@ -6,3 +6,5 @@ test('test', () => {
   const testService = new TestService({ key: 'test' });
   expect(testService.key()).toEqual('test');
 });
+
+test('test2', () => {});

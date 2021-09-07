@@ -9,10 +9,14 @@ module.exports = {
     es6: true,
     node: true,
   },
-  extends: ['eslint:recommended', 'plugin:node/recommended', 'prettier'],
+  extends: [
+    'eslint:recommended',
+    'plugin:node/recommended',
+    'plugin:prettier/recommended',
+  ],
   globals: {},
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
   },
   plugins: ['prettier'],
   rules: {

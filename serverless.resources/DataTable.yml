@@ -1,12 +1,18 @@
 Type: AWS::DynamoDB::Table
 Properties:
-  TableName: usersTable
+  TableName: Data
   AttributeDefinitions:
-    - AttributeName: email
+    - AttributeName: key
+      AttributeType: S
+    - AttributeName: sortKey
+      AttributeType: S
+    - AttributeName: data
       AttributeType: S
   KeySchema:
-    - AttributeName: email
+    - AttributeName: key
       KeyType: HASH
+    - AttributeName: data
+      KeyType: RANGE
   ProvisionedThroughput:
     ReadCapacityUnits: 1
     WriteCapacityUnits: 1

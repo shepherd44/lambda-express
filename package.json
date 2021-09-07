@@ -21,30 +21,27 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "aws-sdk": "^2.654.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.1",
+    "aws-sdk": "^2.983.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^4.2.1",
-    "prettier": "^1.19.1",
+    "prettier": "^2.3.2",
     "serverless": "^2.57.0",
-    "serverless-aws-alias": "^1.8.0",
     "serverless-deployment-bucket": "^1.5.1",
-    "serverless-layers": "^2.5.1",
-    "serverless-plugin-log-retention": "^2.0.0"
+    "serverless-layers": "^2.5.1"
   },
   "engines": {
     "node": ">=14.0.0"
   },
   "workspaces": {
     "packages": [
-      "packages/express-lambda",
-      "packages/node-lambda"
+      "packages/*"
     ],
     "nohoist": [
-      "packages/express-lambda",
-      "packages/node-lambda"
+      "**/express-lambda/**",
+      "**/node-lambda/**"
     ]
   }
 }

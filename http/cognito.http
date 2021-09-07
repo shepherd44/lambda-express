@@ -2,10 +2,35 @@
 @client-id = cognito-client-id
 @callback-url = http://localhost:9000/login-callback
 
-### code
+### code grant - step 1. authorize
+
+GET https://{{cognito-domain-name}}.auth.ap-northeast-2.amazoncognito.com/oauth2/authorize?response_type=code&client_id={{client-id}}&redirect_uri={{callback-url}}
+
+### code grant - step 2. token
+
+POST https://{{cognito-domain-name}}.auth.ap-northeast-2.amazoncognito.com/oauth2/token?grant_type=authorization_code&client_id={{client-id}}&redirect_uri={{callback-url}}&code=code
+Content-Type: application/x-www-form-urlencoded
+
+### token - login
+
+GET https://{{cognito-domain-name}}.auth.ap-northeast-2.amazoncognito.com/login?response_type=token&client_id={{client-id}}&redirect_uri={{callback-url}}
+Origin: http://localhost:9000/login-callback
+
+### code grant - login
 
 GET https://{{cognito-domain-name}}.auth.ap-northeast-2.amazoncognito.com/login?response_type=code&client_id={{client-id}}&redirect_uri={{callback-url}}
 
-### token
+### USER_PASSWORD_AUTH
 
-GET https://{{cognito-domain-name}}.auth.ap-northeast-2.amazoncognito.com/login?response_type=token&client_id={{client-id}}&redirect_uri={{callback-url}}
+POST https://cognito-idp.ap-northeast-2.amazonaws.com/
+X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
+Content-Type: application/x-amz-json-1.1
+
+{
+   "AuthParameters" : {
+      "USERNAME" : "user_name",
+      "PASSWORD" : "user_password"
+   },
+   "AuthFlow" : "USER_PASSWORD_AUTH",
+   "ClientId" : "COGNITO_CLIENT_ID"
+}
